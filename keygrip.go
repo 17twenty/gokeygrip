@@ -3,8 +3,8 @@ package gokeygrip
 import (
 	"crypto/hmac"
 	"crypto/sha1"
+	"crypto/subtle"
 	"encoding/base64"
-	"log"
 	"strings"
 )
 
@@ -30,12 +30,17 @@ func New(keys []string, algorithm string, encoding string) *Keygrip {
 	}
 }
 
-func (kg *Keygrip) Index() {
-	log.Fatal("Not Implemented")
+func (kg *Keygrip) Index(data []byte, digest string) int {
+	for i, key := range kg.keys {
+		if subtle.ConstantTimeCompare([]byte(digest), []byte(kg.SignWithKey(data, key))) == 1 {
+			return i
+		}
+	}
+	return -1
 }
 
-func (kg *Keygrip) Sign(data []byte) string {
-	mac := hmac.New(sha1.New, []byte(kg.keys[0]))
+func (kg *Keygrip) SignWithKey(data []byte, key string) string {
+	mac := hmac.New(sha1.New, []byte(key))
 	mac.Write(data)
 	digest := mac.Sum(nil)
 	cleanDigest := base64.URLEncoding.EncodeToString(digest)
@@ -55,9 +60,10 @@ func (kg *Keygrip) Sign(data []byte) string {
 	return strings.Map(keygripSafeFunc, cleanDigest)
 }
 
-// func (kg *Keygrip) Verify() {
-// 	mac := hmac.New(sha256.New, key)
-// 	mac.Write(message)
-// 	expectedMAC := mac.Sum(nil)
-// 	return hmac.Equal(messageMAC, expectedMAC)
-// }
+func (kg *Keygrip) Sign(data []byte) string {
+	return kg.SignWithKey(data, kg.keys[0])
+}
+
+func (kg *Keygrip) Verify(data []byte, digest string) bool {
+	return kg.Index(data, digest) > -1
+}

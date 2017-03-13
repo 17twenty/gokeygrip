@@ -14,8 +14,9 @@ func TestMain(m *testing.M) {
 }
 
 func Test(t *testing.T) {
-	foo := New([]string{"06ae66fdc6c2faf5a401b70e0bf885cb"})
-	logger.Printf("%s", foo.Sign([]byte("bieberschnitzel")))
+	foo := New([]string{"06ae66fdc6c2faf5a401b70e0bf885cb"}, "", "")
+	hash := foo.Sign([]byte("bieberschnitzel"))
+	logger.Printf("%s", hash)
 
 	log.Println("-----")
 	{
@@ -23,6 +24,17 @@ func Test(t *testing.T) {
 		// bar := hmac.New(sha256.New, []byte(foo))
 		// bar.Write([]byte("I love cupcakes"))
 		// log.Println(hex.EncodeToString(bar.Sum(nil)))
+
+		// .index returns the index of the first matching key
+		index := foo.Index([]byte("bieberschnitzel"), hash)
+		log.Println(index, 0)
+
+		// .verify returns the a boolean indicating a matched key
+		matched := foo.Verify([]byte("bieberschnitzel"), hash)
+		log.Println(matched)
+
+		index = foo.Index([]byte("bieberschnitzel"), "o_O")
+		log.Println(index, -1)
 	}
 }
 

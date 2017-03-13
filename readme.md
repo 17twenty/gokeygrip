@@ -4,11 +4,8 @@ go-keygrip is a port of the node.js module for signing and verifying data throug
 
 ## API
 
-```
-keys = Keygrip(keylist)
-```
-
-This creates a new Keygrip based on the provided keylist.
+To create a new Keygrip based on the provided keylist you can specify either
+algorithm and encoding or use the defaults (SHA1 in base64) like so:
 ```
 import "github.com/17twenty/gokeygrip"
 ...

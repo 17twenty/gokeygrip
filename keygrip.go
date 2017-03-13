@@ -14,7 +14,7 @@ import (
 
 // Keygrip is our internal struct
 type Keygrip struct {
-	keys     []string
+	Keys     []string
 	hashFunc func() hash.Hash
 	encoding Encoding
 }
@@ -38,7 +38,7 @@ func New(algorithm crypto.Hash, enc Encoding, keys ...string) *Keygrip {
 	}
 
 	return &Keygrip{
-		keys:     keys,
+		Keys:     keys,
 		hashFunc: algorithm.New,
 		encoding: enc,
 	}
@@ -48,7 +48,7 @@ func New(algorithm crypto.Hash, enc Encoding, keys ...string) *Keygrip {
 func NewDefault(keys ...string) *Keygrip {
 
 	return &Keygrip{
-		keys:     keys,
+		Keys:     keys,
 		hashFunc: sha1.New,
 		encoding: BASE64,
 	}
@@ -59,7 +59,7 @@ func (kg *Keygrip) Index(data, digest string) int {
 	if kg == nil {
 		log.Fatalln("Keygrip not initialised")
 	}
-	for i, key := range kg.keys {
+	for i, key := range kg.Keys {
 		if subtle.ConstantTimeCompare([]byte(digest), []byte(kg.SignWithKey(data, key))) == 1 {
 			return i
 		}
@@ -104,7 +104,10 @@ func (kg *Keygrip) SignWithKey(data, key string) string {
 // Sign returns the hash for the first key
 // - default hashes are SHA1 HMACs in url-safe base64
 func (kg *Keygrip) Sign(data string) string {
-	return kg.SignWithKey(data, kg.keys[0])
+	if len(kg.Keys) < 1 {
+		return ""
+	}
+	return kg.SignWithKey(data, kg.Keys[0])
 }
 
 // Verify returns the a boolean indicating a matched key

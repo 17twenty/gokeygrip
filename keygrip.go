@@ -4,7 +4,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha1"
 	"encoding/base64"
-	"errors"
+	"log"
 	"strings"
 )
 
@@ -30,32 +30,8 @@ func New(keys []string, algorithm string, encoding string) *Keygrip {
 	}
 }
 
-// SetHash sets the hash type
-func (kg *Keygrip) SetHash() {
-
-}
-
-// SetHash sets the hash type
-func (kg *Keygrip) GetHash() {
-
-}
-
-// SetCipher sets the cipher type
-func (kg *Keygrip) SetCipher() {
-
-}
-
-// GetCipher gets the cipher type
-func (kg *Keygrip) GetCipher() {
-
-}
-
-func (kg *Keygrip) Encrypt() []byte {
-	return []byte{}
-}
-
-func (kg *Keygrip) Decrypt([]byte) (error, []byte) {
-	return errors.New("Couldn't decrypt"), []byte{}
+func (kg *Keygrip) Index() {
+	log.Fatal("Not Implemented")
 }
 
 func (kg *Keygrip) Sign(data []byte) string {

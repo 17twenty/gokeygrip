@@ -12,7 +12,8 @@ This creates a new Keygrip based on the provided keylist.
 ```
 import "github.com/17twenty/gokeygrip"
 ...
-keys := gokeygrip.New([]string{"SEKRIT2", "SEKRIT1"}, "", "")
+keys := gokeygrip.New(crypto.SHA1, BASE64,"06ae66fdc6c2faf5a401b70e0bf885cb")
+withDefaults := gokeygrip.NewDefault("06ae66fdc6c2faf5a401b70e0bf885cb")
 ```
 The keylist is an array of all valid keys for signing, in descending order of freshness; new keys should be unshifted into the array and old keys should be popped.
 

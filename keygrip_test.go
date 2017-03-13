@@ -1,47 +1,45 @@
 package gokeygrip
 
 import (
+	"crypto"
 	"log"
 	"os"
 	"testing"
+
+	_ "crypto/sha1"
+	_ "crypto/sha256"
+	_ "crypto/sha512"
 )
 
 var logger *log.Logger
 
 func TestMain(m *testing.M) {
-	logger = log.New(os.Stderr, "gotifications: ", log.LstdFlags|log.Lshortfile)
+	logger = log.New(os.Stderr, "testing: ", log.LstdFlags|log.Lshortfile)
 	os.Exit(m.Run())
 }
 
 func Test(t *testing.T) {
-	foo := New([]string{"06ae66fdc6c2faf5a401b70e0bf885cb"}, "", "")
-	hash := foo.Sign([]byte("bieberschnitzel"))
+	foo := New(crypto.SHA1, BASE64, "06ae66fdc6c2faf5a401b70e0bf885cb")
+	hash := foo.Sign("bieberschnitzel")
 	logger.Printf("%s", hash)
+	if hash != "qcnaleT6EOQqYoxYrness05NAW8" {
+		t.Fatal("Hash didn't match - got", hash, "expected qcnaleT6EOQqYoxYrness05NAW8")
+	}
 
-	log.Println("-----")
-	{
-		// foo := "abcdefg"
-		// bar := hmac.New(sha256.New, []byte(foo))
-		// bar.Write([]byte("I love cupcakes"))
-		// log.Println(hex.EncodeToString(bar.Sum(nil)))
+	// .index returns the index of the first matching key
+	index := foo.Index("bieberschnitzel", hash)
+	if index != 0 {
+		t.Fatal("Index didn't match - got", index, "expected 0")
+	}
 
-		// .index returns the index of the first matching key
-		index := foo.Index([]byte("bieberschnitzel"), hash)
-		log.Println(index, 0)
+	// .verify returns the a boolean indicating a matched key
+	matched := foo.Verify("bieberschnitzel", hash)
+	if matched != true {
+		t.Fatal("matched didn't match - got", matched, "expected true")
+	}
 
-		// .verify returns the a boolean indicating a matched key
-		matched := foo.Verify([]byte("bieberschnitzel"), hash)
-		log.Println(matched)
-
-		index = foo.Index([]byte("bieberschnitzel"), "o_O")
-		log.Println(index, -1)
+	index = foo.Index("bieberschnitzel", "o_O")
+	if index != -1 {
+		t.Fatal("Index didn't match - got", index, "expected -1")
 	}
 }
-
-// const secret = 'abcdefg';
-// const hash = crypto.createHmac('sha256', secret)
-//                    .update('I love cupcakes')
-//                    .digest('hex');
-// console.log(hash);
-// // Prints:
-// //   c0fa1bc00531bd78ef38c628449c5102aeabd49b5dc3a2a516ea6ea959d6658e
